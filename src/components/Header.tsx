@@ -1,28 +1,22 @@
-'use client'
-
-import Link from 'next/link'
+import Logo from './Logo'
 import { Search } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Header() {
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg" />
-            <span className="font-bold text-xl text-gray-900">
-              FindItLocal
-            </span>
-          </Link>
+          <Logo size="md" />
           
           <nav className="hidden md:flex space-x-8">
-            <Link href="/search" className="text-gray-700 hover:text-blue-600">
+            <Link href="/search" className="text-gray-700 hover:text-blue-600 transition-colors">
               All Companies
             </Link>
-            <Link href="/category/cleaning" className="text-gray-700 hover:text-blue-600">
+            <Link href="/category/cleaning" className="text-gray-700 hover:text-blue-600 transition-colors">
               Cleaning
             </Link>
-            <Link href="/category/moving" className="text-gray-700 hover:text-blue-600">
+            <Link href="/category/moving" className="text-gray-700 hover:text-blue-600 transition-colors">
               Moving
             </Link>
           </nav>
