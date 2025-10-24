@@ -11,7 +11,7 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg" />
             <span className="font-bold text-xl text-gray-900">
-              DubaiCleanMove
+              FindItLocal
             </span>
           </Link>
           
