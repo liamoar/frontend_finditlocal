@@ -6,11 +6,15 @@ export class BusinessService {
     let query = supabase.from('businesses').select('*')
     
     if (filters.category) {
-      query = query.eq('category', filters.category)
+      // Handle URL-encoded spaces (%20) and convert to regular spaces
+      const decodedCategory = decodeURIComponent(filters.category).replace(/-/g, ' ')
+      query = query.eq('category', decodedCategory)
     }
     
     if (filters.area) {
-      query = query.eq('area', filters.area)
+      // Handle URL-encoded spaces (%20) and convert to regular spaces
+      const decodedArea = decodeURIComponent(filters.area).replace(/-/g, ' ')
+      query = query.eq('area', decodedArea)
     }
     
     if (filters.query) {
@@ -55,12 +59,15 @@ export class BusinessService {
   }
 
   static async getBusinessesByCategoryAndArea(category: string, area: string): Promise<Business[]> {
+    const decodedCategory = decodeURIComponent(category).replace(/-/g, ' ')
+    const decodedArea = decodeURIComponent(area).replace(/-/g, ' ')
+    
     const { data, error } = await supabase
       .from('businesses')
       .select('*')
-      .eq('category', category)
-      .eq('area', area)
-    
+      .eq('category', decodedCategory)
+      .eq('area', decodedArea)
+
     if (error) throw error
     return data || []
   }

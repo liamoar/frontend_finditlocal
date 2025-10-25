@@ -2,20 +2,20 @@ import { BusinessService } from '@/services/businessService'
 import { MetadataRoute } from 'next'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://findinlocal.com/'
+  const baseUrl = 'https://findinlocal.com'
   
-  const [categories, areas, businesses] = await Promise.all([
+  const [categories, areas] = await Promise.all([
     BusinessService.getUniqueCategories(),
-    BusinessService.getUniqueAreas(),
-    BusinessService.getBusinesses()
+    BusinessService.getUniqueAreas()
   ])
 
+  // Static Pages - High Priority
   const staticPages = [
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
-      priority: 1,
+      priority: 1.0,
     },
     {
       url: `${baseUrl}/search`,
@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   ]
 
+  // Category Pages - Medium Priority
   const categoryPages = categories.map(category => ({
     url: `${baseUrl}/category/${encodeURIComponent(category)}`,
     lastModified: new Date(),
@@ -32,6 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
+  // Area Pages - Medium Priority
   const areaPages = areas.map(area => ({
     url: `${baseUrl}/area/${encodeURIComponent(area)}`,
     lastModified: new Date(),
@@ -39,18 +41,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  const businessPages = businesses.map(business => ({
-    url: `${baseUrl}/business/${business.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }))
-
+  // Category + Area Combination Pages - Use query parameters
   const categoryAreaPages = categories.flatMap(category =>
-    areas.map(area => ({
-      url: `${baseUrl}/category/${encodeURIComponent(category)}/${encodeURIComponent(area)}`,
+    areas.slice(0, 3).map(area => ({
+      url: `${baseUrl}/category/${encodeURIComponent(category)}?area=${encodeURIComponent(area)}`,
       lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
+      changeFrequency: 'monthly' as const,
       priority: 0.6,
     }))
   )
@@ -59,7 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...categoryPages,
     ...areaPages,
-    ...businessPages,
     ...categoryAreaPages,
   ]
 }

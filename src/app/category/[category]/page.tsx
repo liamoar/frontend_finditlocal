@@ -25,12 +25,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CategoryPage({ params, searchParams }: PageProps) {
   const { category } = await params
   const { area } = await searchParams
+  
+  // Use decodeURIComponent to handle %20 spaces
   const decodedCategory = decodeURIComponent(category)
+  const decodedArea = area ? decodeURIComponent(area) : ''
   
   const [businesses, areas] = await Promise.all([
     BusinessService.getBusinesses({ 
       category: decodedCategory,
-      area: area || ''
+      area: decodedArea
     }),
     BusinessService.getUniqueAreas()
   ])

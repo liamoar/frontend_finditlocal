@@ -31,11 +31,12 @@ export default function CategoryClient({
     setSelectedArea(area)
     setIsLoading(true)
     
-    // Update URL without navigation for better UX
-    const newUrl = `/category/${encodeURIComponent(category)}${area ? `?area=${encodeURIComponent(area)}` : ''}`
+    // Use encodeURIComponent to properly encode spaces
+    const areaParam = area ? `?area=${encodeURIComponent(area)}` : ''
+    const newUrl = `/category/${encodeURIComponent(category)}${areaParam}`
     window.history.pushState({}, '', newUrl)
     
-    // Filter businesses locally for instant feedback
+    // Filter businesses locally
     if (!area) {
       setBusinesses(initialBusinesses)
       setIsLoading(false)
