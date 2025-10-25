@@ -5,18 +5,16 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Dubai Cleaning & Moving Companies Directory | Find Trusted Services in one place',
-  description: 'Find the best cleaning and moving companies in Dubai. Compare ratings, prices, and services for residential and commercial cleaning and moving services across all Dubai areas.',
-  keywords: 'cleaning dubai, moving companies dubai, house cleaning, office cleaning, movers dubai, cleaning services',
+  title: 'FindItLocal - Discover Trusted Local Services in Dubai | Home Services Directory',
+  description: 'Find the best local service providers in Dubai. Compare ratings, prices, and services for cleaning, moving, plumbing, electrical, AC repair, pest control and more across all Dubai areas.',
+  keywords: 'local services dubai, home services, cleaning, moving, plumbing, electrician, AC repair, pest control, carpentry, painting, home renovation, laundry, maid service, appliance repair',
   openGraph: {
-    title: 'Dubai Cleaning & Moving Companies Directory',
-    description: 'Find trusted cleaning and moving companies across Dubai',
+    title: 'FindItLocal - Discover Trusted Local Services in Dubai',
+    description: 'Find trusted local service providers across Dubai for all your home and business needs.',
     type: 'website',
     locale: 'en_AE',
+    siteName: 'FindItLocal',
   },
-  verification: {
-    google: 'your-google-search-console-verification',
-  }
 }
 
 export default function RootLayout({

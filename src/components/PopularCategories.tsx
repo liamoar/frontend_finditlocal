@@ -6,7 +6,15 @@ interface PopularCategoriesProps {
 }
 
 export default function PopularCategories({ categories }: PopularCategoriesProps) {
-  const popularCategories = categories.slice(0, 8) // Show top 8 categories
+  const popularCategories = categories.slice(0, 12) // Show more categories now
+
+  // Format category names for display
+  const formatCategoryName = (category: string) => {
+    return category
+      .replace('service', '')
+      .replace('company', '')
+      .trim()
+  }
 
   return (
     <section className="py-16 bg-white">
@@ -16,11 +24,11 @@ export default function PopularCategories({ categories }: PopularCategoriesProps
             Popular Service Categories
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Browse through the most sought-after cleaning and moving services in Dubai
+            Browse through Dubai's most trusted local service providers
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {popularCategories.map((category) => (
             <Link
               key={category}
@@ -29,11 +37,11 @@ export default function PopularCategories({ categories }: PopularCategoriesProps
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-700 mb-2">
-                    {category}
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-700 mb-2 capitalize">
+                    {formatCategoryName(category)}
                   </h3>
                   <p className="text-sm text-gray-600 group-hover:text-blue-600">
-                    View companies
+                    View service providers
                   </p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" />
@@ -42,13 +50,13 @@ export default function PopularCategories({ categories }: PopularCategoriesProps
           ))}
         </div>
 
-        {categories.length > 8 && (
+        {categories.length > 12 && (
           <div className="text-center mt-8">
             <Link
               href="/search"
               className="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
-              View All Categories
+              View All Service Categories
             </Link>
           </div>
         )}

@@ -11,8 +11,8 @@ interface SearchPageProps {
 }
 
 export const metadata: Metadata = {
-  title: 'Search Cleaning & Moving Companies in Dubai',
-  description: 'Search and compare cleaning and moving companies across Dubai. Filter by category, area, and ratings to find the perfect service provider.',
+  title: 'Search Local Services in Dubai | FindItLocal',
+  description: 'Search and compare local service providers across Dubai. Filter by category, area, and ratings to find the perfect service for your needs.',
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {

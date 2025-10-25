@@ -6,6 +6,8 @@ import { Business } from '@/types/business'
 import BusinessGrid from './BusinessGrid'
 import Header from './Header'
 import { Search, Filter, X } from 'lucide-react'
+import LoadingSpinner from './LoadingSpinner'
+import BusinessGridLoading from './BusinessGridLoading'
 
 interface SearchClientProps {
   initialBusinesses: Business[]
@@ -33,14 +35,16 @@ export default function SearchClient({
     area: initialFilters.area || ''
   })
   const [showFilters, setShowFilters] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setBusinesses(initialBusinesses)
   }, [initialBusinesses])
 
-  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+  const handleFilterChange = async (key: keyof typeof filters, value: string) => {
     const newFilters = { ...filters, [key]: value }
     setFilters(newFilters)
+    setIsLoading(true)
     
     const params = new URLSearchParams()
     if (newFilters.query) params.set('query', newFilters.query)
@@ -50,16 +54,21 @@ export default function SearchClient({
     router.push(`/search?${params.toString()}`, { scroll: false })
   }
 
-  const clearFilters = () => {
+  const clearFilters = async () => {
     setFilters({ query: '', category: '', area: '' })
+    setIsLoading(true)
     router.push('/search', { scroll: false })
   }
+
+  // Reset loading when navigation completes
+  useEffect(() => {
+    setIsLoading(false)
+  }, [businesses])
 
   const hasActiveFilters = filters.query || filters.category || filters.area
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Add Header here */}
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -80,16 +89,18 @@ export default function SearchClient({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search companies by name..."
+                placeholder="Search companies..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={filters.query}
                 onChange={(e) => handleFilterChange('query', e.target.value)}
+                disabled={isLoading}
               />
             </div>
             
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={isLoading}
+              className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Filter className="w-5 h-5" />
               <span>Filters</span>
@@ -100,9 +111,10 @@ export default function SearchClient({
           {showFilters && (
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
               <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
+                disabled={isLoading}
               >
                 <option value="">All Categories</option>
                 {categories.map(category => (
@@ -111,9 +123,10 @@ export default function SearchClient({
               </select>
 
               <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 value={filters.area}
                 onChange={(e) => handleFilterChange('area', e.target.value)}
+                disabled={isLoading}
               >
                 <option value="">All Areas</option>
                 {areas.map(area => (
@@ -133,7 +146,8 @@ export default function SearchClient({
                     Search: {filters.query}
                     <button
                       onClick={() => handleFilterChange('query', '')}
-                      className="ml-2 hover:text-blue-600"
+                      className="ml-2 hover:text-blue-600 disabled:opacity-50"
+                      disabled={isLoading}
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -144,7 +158,8 @@ export default function SearchClient({
                     Category: {filters.category}
                     <button
                       onClick={() => handleFilterChange('category', '')}
-                      className="ml-2 hover:text-green-600"
+                      className="ml-2 hover:text-green-600 disabled:opacity-50"
+                      disabled={isLoading}
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -155,7 +170,8 @@ export default function SearchClient({
                     Area: {filters.area}
                     <button
                       onClick={() => handleFilterChange('area', '')}
-                      className="ml-2 hover:text-purple-600"
+                      className="ml-2 hover:text-purple-600 disabled:opacity-50"
+                      disabled={isLoading}
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -164,7 +180,8 @@ export default function SearchClient({
               </div>
               <button
                 onClick={clearFilters}
-                className="text-sm text-red-600 hover:text-red-700"
+                disabled={isLoading}
+                className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
               >
                 Clear all
               </button>
@@ -176,11 +193,22 @@ export default function SearchClient({
         <div>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
-              {businesses.length} companies found
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <LoadingSpinner size="sm" />
+                  <span>Loading companies...</span>
+                </div>
+              ) : (
+                `${businesses.length} companies found`
+              )}
             </h2>
           </div>
           
-          <BusinessGrid businesses={businesses} />
+          {isLoading ? (
+            <BusinessGridLoading count={6} />
+          ) : (
+            <BusinessGrid businesses={businesses} />
+          )}
         </div>
       </div>
     </div>

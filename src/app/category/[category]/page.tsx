@@ -1,45 +1,49 @@
 import { Metadata } from 'next'
 import { BusinessService } from '@/services/businessService'
-import BusinessGrid from '@/components/BusinessGrid'
 import Header from '@/components/Header'
+import CategoryClient from './categoryClient'
 
 interface PageProps {
   params: Promise<{
     category: string
   }>
+  searchParams: Promise<{
+    area?: string
+  }>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  // Await the params promise
   const { category } = await params
   const decodedCategory = decodeURIComponent(category)
   
   return {
-    title: `${decodedCategory} Companies in Dubai | Best ${decodedCategory} Services`,
+    title: `${decodedCategory} in Dubai | Find Trusted ${decodedCategory} Providers | FindItLocal`,
     description: `Find the best ${decodedCategory.toLowerCase()} companies in Dubai. Compare ratings, prices, and contact information for trusted ${decodedCategory.toLowerCase()} services.`,
   }
 }
 
-export default async function CategoryPage({ params }: PageProps) {
-  // Await the params promise
+export default async function CategoryPage({ params, searchParams }: PageProps) {
   const { category } = await params
+  const { area } = await searchParams
   const decodedCategory = decodeURIComponent(category)
-  const businesses = await BusinessService.getBusinesses({ category: decodedCategory })
+  
+  const [businesses, areas] = await Promise.all([
+    BusinessService.getBusinesses({ 
+      category: decodedCategory,
+      area: area || ''
+    }),
+    BusinessService.getUniqueAreas()
+  ])
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {decodedCategory} Companies in Dubai
-          </h1>
-          <p className="text-gray-600">
-            Find the best {decodedCategory.toLowerCase()} companies across all Dubai areas
-          </p>
-        </div>
-        
-        <BusinessGrid businesses={businesses} />
+        <CategoryClient 
+          initialBusinesses={businesses}
+          areas={areas}
+          category={decodedCategory}
+        />
       </div>
     </div>
   )
