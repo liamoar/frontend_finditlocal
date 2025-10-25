@@ -19,7 +19,7 @@ export default function Logo({ className = "", size = 'md' }: LogoProps) {
     <Link href="/" className={`inline-block ${className}`}>
       <Image
         src="/logo.png"
-        alt="FindItLocal - Discover Local Businesses in Dubai"
+        alt="FindInLocal - Discover Local Businesses in Dubai"
         width={width}
         height={height}
         className="object-contain"
