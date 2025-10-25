@@ -11,7 +11,7 @@ interface SearchPageProps {
 }
 
 export const metadata: Metadata = {
-  title: 'Search Local Services in Dubai | FindItLocal',
+  title: 'Search Local Services in Dubai | FindInLocal',
   description: 'Search and compare local service providers across Dubai. Filter by category, area, and ratings to find the perfect service for your needs.',
 }
 

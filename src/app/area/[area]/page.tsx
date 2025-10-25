@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const decodedArea = decodeURIComponent(area)
   
   return {
-    title: `Local Services in ${decodedArea}, Dubai | FindItLocal`,
+    title: `Local Services in ${decodedArea}, Dubai | FindInLocal`,
     description: `Find the best local service providers in ${decodedArea}, Dubai. Compare ratings, prices, and contact information for cleaning, moving, plumbing, electrical and more services.`,
   }
 }
