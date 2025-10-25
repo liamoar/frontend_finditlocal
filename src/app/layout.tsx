@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Dubai Cleaning & Moving Companies Directory | Find Trusted Services',
+  title: 'Dubai Cleaning & Moving Companies Directory | Find Trusted Services in one place',
   description: 'Find the best cleaning and moving companies in Dubai. Compare ratings, prices, and services for residential and commercial cleaning and moving services across all Dubai areas.',
   keywords: 'cleaning dubai, moving companies dubai, house cleaning, office cleaning, movers dubai, cleaning services',
   openGraph: {
