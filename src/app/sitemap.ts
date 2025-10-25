@@ -2,7 +2,7 @@ import { BusinessService } from '@/services/businessService'
 import { MetadataRoute } from 'next'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'http://localhost:3000/'
+  const baseUrl = 'https://findinlocal.com/'
   
   const [categories, areas, businesses] = await Promise.all([
     BusinessService.getUniqueCategories(),
