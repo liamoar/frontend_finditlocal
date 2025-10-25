@@ -5,15 +5,35 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FindItLocal - Discover Trusted Local Services in Dubai | Home Services Directory',
+  title: 'FindInLocal - Discover Trusted Local Services in Dubai | Home Services Directory',
   description: 'Find the best local service providers in Dubai. Compare ratings, prices, and services for cleaning, moving, plumbing, electrical, AC repair, pest control and more across all Dubai areas.',
   keywords: 'local services dubai, home services, cleaning, moving, plumbing, electrician, AC repair, pest control, carpentry, painting, home renovation, laundry, maid service, appliance repair',
   openGraph: {
-    title: 'FindItLocal - Discover Trusted Local Services in Dubai',
+    title: 'FindInLocal - Discover Trusted Local Services in Dubai',
     description: 'Find trusted local service providers across Dubai for all your home and business needs.',
     type: 'website',
     locale: 'en_AE',
-    siteName: 'FindItLocal',
+    siteName: 'FindInLocal',
+    url: 'https://findinlocal.com',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'FindInLocal - Dubai Local Services Directory',
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 }
 
@@ -25,27 +45,39 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Analytics 4 */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-15QMLW1NP6"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-XXXXXXX');
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-15QMLW1NP6');
             `,
+          }}
+        />
+        
+        {/* Structured Data for Local Business Directory */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "FindInLocal",
+              "description": "Dubai's premier local services directory for cleaning, moving, plumbing, and home services",
+              "url": "https://findinlocal.com",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://findinlocal.com/search?query={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
           }}
         />
       </head>
       <body className={inter.className}>
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
         {children}
       </body>
     </html>
