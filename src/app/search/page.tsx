@@ -7,27 +7,51 @@ interface SearchPageProps {
     query?: string
     category?: string
     area?: string
+    page?: string
+    sort?: string
   }>
 }
 
 export const metadata: Metadata = {
-  title: 'Search Local Services in Dubai | FindInLocal',
+  title: 'Search Local Services in Dubai | FindItLocal',
   description: 'Search and compare local service providers across Dubai. Filter by category, area, and ratings to find the perfect service for your needs.',
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  // Await the searchParams promise
   const params = await searchParams
-  const initialBusinesses = await BusinessService.getBusinesses(params)
-  const categories = await BusinessService.getUniqueCategories()
-  const areas = await BusinessService.getUniqueAreas()
+  const page = parseInt(params.page || '1')
+  const sortBy = params.sort as 'rating' | 'reviews' | 'name' | 'newest' || 'rating'
+
+  const result = await BusinessService.getBusinessesPaginated(
+    {
+      query: params.query,
+      category: params.category,
+      area: params.area
+    },
+    {
+      page,
+      pageSize: 20,
+      sortBy
+    }
+  )
+
+  const [categories, areas] = await Promise.all([
+    BusinessService.getUniqueCategories(),
+    BusinessService.getUniqueAreas()
+  ])
 
   return (
     <SearchClient 
-      initialBusinesses={initialBusinesses}
+      initialData={result}
       categories={categories}
       areas={areas}
-      initialFilters={params}
+      initialFilters={{
+        query: params.query || '',
+        category: params.category || '',
+        area: params.area || ''
+      }}
+      initialSort={sortBy}
+      currentPage={page}
     />
   )
 }
