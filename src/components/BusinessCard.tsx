@@ -111,7 +111,7 @@ export default function BusinessCard({ business }: BusinessCardProps) {
         )}
 
         {/* Topics - Review Highlights */}
-        {hasTopics && (
+       {/* {hasTopics && (
           <div className="flex items-start space-x-2 pt-2">
             <Tag className="w-4 h-4 mt-0.5 flex-shrink-0 text-purple-500" />
             <div className="flex-1">
@@ -129,7 +129,7 @@ export default function BusinessCard({ business }: BusinessCardProps) {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Action Buttons */}
