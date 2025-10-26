@@ -13,6 +13,7 @@ export interface Business {
   rating: number | null;
   reviews: number | null;
   whatsapp: string | null;
+  topics : string[] | null;
 }
 
 export interface SearchFilters {

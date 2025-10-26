@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import Scripts from '@/components/Script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -45,40 +46,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics 4 */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-15QMLW1NP6"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-15QMLW1NP6');
-            `,
-          }}
-        />
-        
-        {/* Structured Data for Local Business Directory */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              "name": "FindInLocal",
-              "description": "Dubai's premier local services directory for cleaning, moving, plumbing, and home services",
-              "url": "https://findinlocal.com",
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://findinlocal.com/search?query={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
-            })
-          }}
-        />
+        {/* No scripts here - they're loaded client-side */}
       </head>
       <body className={inter.className}>
         {children}
+        <Scripts />
       </body>
     </html>
   )

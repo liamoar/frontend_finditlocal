@@ -1,7 +1,7 @@
 'use client'
 
 import { Business } from '@/types/business'
-import { MapPin, Phone, Star, Globe, MessageCircle, Clock, User, Navigation } from 'lucide-react'
+import { MapPin, Phone, Star, Globe, MessageCircle, Clock, User, Navigation, Tag } from 'lucide-react'
 
 interface BusinessCardProps {
   business: Business
@@ -12,35 +12,27 @@ export default function BusinessCard({ business }: BusinessCardProps) {
     if (!openingHours) return null
     
     try {
-      // If it's the Google Places API format with weekday_text
-      if (openingHours.weekday_text && Array.isArray(openingHours.weekday_text)) {
-        const today = new Date().getDay() // 0 = Sunday, 1 = Monday, etc.
-        
-        // Adjust for Google's format: weekday_text[0] is Monday, [6] is Sunday
-        let todayIndex = today - 1
-        if (today === 0) todayIndex = 6 // Sunday is last in array
-        
-        if (openingHours.weekday_text[todayIndex]) {
-          const todayHours = openingHours.weekday_text[todayIndex]
-          // Remove day name and show just hours
-          const hoursOnly = todayHours.replace(/^[^:]+:\s*/, '')
-          return `Today: ${hoursOnly}`
-        }
-        
-        // Fallback: show first day's hours
-        return openingHours.weekday_text[0]?.replace(/^[^:]+:\s*/, '')
-      }
-      
-      // Handle string format as fallback
       if (typeof openingHours === 'string') {
         return openingHours.length > 60 ? `${openingHours.substring(0, 60)}...` : openingHours
       }
       
+      if (typeof openingHours === 'object') {
+        if (openingHours.weekday_text) {
+          return openingHours.weekday_text[0] // Show first day
+        }
+        
+        const today = new Date().toLocaleString('en-us', { weekday: 'long' }).toLowerCase()
+        if (openingHours[today]) {
+          return `Today: ${openingHours[today]}`
+        }
+        
+        return 'Opening hours available'
+      }
     } catch (error) {
-      console.error('Error formatting opening hours:', error)
+      return 'Opening hours available'
     }
     
-    return 'Opening hours available'
+    return null
   }
 
   const getRatingSource = () => {
@@ -52,6 +44,10 @@ export default function BusinessCard({ business }: BusinessCardProps) {
 
   const shouldShowRating = business.rating !== null && business.rating !== undefined
   const openingHours = formatOpeningHours(business.opening_hours)
+  
+  // Safe topics handling
+  const topics = business.topics || []
+  const hasTopics = topics.length > 0
 
   const openGoogleMaps = () => {
     const query = encodeURIComponent(`${business.name} ${business.area} Dubai`)
@@ -108,16 +104,29 @@ export default function BusinessCard({ business }: BusinessCardProps) {
         {openingHours && (
           <div className="flex items-start space-x-2">
             <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span className="text-green-600 font-medium text-xs">
+              {openingHours}
+            </span>
+          </div>
+        )}
+
+        {/* Topics - Review Highlights */}
+        {hasTopics && (
+          <div className="flex items-start space-x-2 pt-2">
+            <Tag className="w-4 h-4 mt-0.5 flex-shrink-0 text-purple-500" />
             <div className="flex-1">
-              <span className="text-green-600 font-medium text-xs">
-                {openingHours}
-              </span>
-              {/* Show "Open Now" badge if available */}
-              {business.opening_hours?.open_now && (
-                <span className="ml-2 bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded">
-                  Open Now
-                </span>
-              )}
+              <span className="text-xs text-gray-500 font-medium mb-1 block">Review Highlights:</span>
+              <div className="flex flex-wrap gap-1">
+                {topics.slice(0, 5).map((topic, index) => (
+                  <span
+                    key={index}
+                    className="inline-block bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs border border-purple-200"
+                    title={`Customers mention: ${topic}`}
+                  >
+                    #{topic.toLowerCase().replace(/\s+/g, '')}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -160,7 +169,7 @@ export default function BusinessCard({ business }: BusinessCardProps) {
         )}
       </div>
 
-      {/* Categories and Area Tags */}
+      {/* Categories, Area, and Rating Tags */}
       <div className="mt-4 flex flex-wrap gap-2 pt-4 border-t border-gray-100">
         <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium capitalize">
           {business.category.replace('service', '').replace('company', '').trim()}
