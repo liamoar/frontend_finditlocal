@@ -1,51 +1,92 @@
 'use client'
-
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Business } from '@/types/business'
+import { PaginatedResult } from '@/services/businessService'
 import BusinessGrid from '@/components/BusinessGrid'
-import { Filter, X } from 'lucide-react'
+import { Filter, X, ChevronLeft, ChevronRight, Star, Users, AArrowUp, Calendar } from 'lucide-react'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import BusinessGridLoading from '@/components/BusinessGridLoading'
 
 interface AreaClientProps {
-  initialBusinesses: Business[]
+  initialData: PaginatedResult
   categories: string[]
   area: string
+  currentPage: number
+  currentSort: string
+  currentCategory: string
 }
 
 export default function AreaClient({ 
-  initialBusinesses, 
+  initialData, 
   categories, 
-  area 
+  area, 
+  currentPage, 
+  currentSort, 
+  currentCategory 
 }: AreaClientProps) {
-  const [businesses, setBusinesses] = useState<Business[]>(initialBusinesses)
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const router = useRouter()
+  const [data, setData] = useState<PaginatedResult>(initialData)
+  const [selectedCategory, setSelectedCategory] = useState(currentCategory)
+  const [sortBy, setSortBy] = useState(currentSort)
   const [isLoading, setIsLoading] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
 
+  console.log('AreaClient Render:', { 
+    currentPage, 
+    currentSort, 
+    currentCategory, 
+    isLoading,
+    businessesCount: data.businesses.length 
+  })
+
+  // Reset loading state when new data arrives
   useEffect(() => {
-    setBusinesses(initialBusinesses)
-  }, [initialBusinesses])
+    console.log('useEffect - updating state from props')
+    setData(initialData)
+    setSelectedCategory(currentCategory)
+    setSortBy(currentSort)
+    setIsLoading(false) // CRITICAL: Reset loading when new data arrives
+  }, [initialData, currentCategory, currentSort])
+
+  // Safety timeout to prevent infinite loading
+  useEffect(() => {
+    if (isLoading) {
+      const timeoutId = setTimeout(() => {
+        console.warn('Loading timeout - resetting state')
+        setIsLoading(false)
+      }, 10000) // 10 second timeout
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [isLoading])
+
+  const updateURL = (category: string, sort: string, page: number) => {
+    console.log('updateURL called:', { category, sort, page })
+    setIsLoading(true)
+    
+    const params = new URLSearchParams()
+    if (category) params.set('category', category)
+    if (sort !== 'rating') params.set('sort', sort)
+    if (page > 1) params.set('page', page.toString())
+    
+    const url = `/area/${encodeURIComponent(area)}${params.toString() ? `?${params.toString()}` : ''}`
+    console.log('Navigating to:', url)
+    router.push(url, { scroll: false })
+  }
 
   const handleCategoryChange = async (category: string) => {
     setSelectedCategory(category)
-    setIsLoading(true)
-    
-    // Update URL without navigation for better UX
-    const newUrl = `/area/${encodeURIComponent(area)}${category ? `?category=${encodeURIComponent(category)}` : ''}`
-    window.history.pushState({}, '', newUrl)
-    
-    // Filter businesses locally for instant feedback
-    if (!category) {
-      setBusinesses(initialBusinesses)
-      setIsLoading(false)
-    } else {
-      const filtered = initialBusinesses.filter(business => 
-        business.category.toLowerCase() === category.toLowerCase()
-      )
-      setBusinesses(filtered)
-      setIsLoading(false)
-    }
+    updateURL(category, sortBy, 1)
+  }
+
+  const handleSortChange = async (sort: string) => {
+    setSortBy(sort)
+    updateURL(selectedCategory, sort, 1)
+  }
+
+  const handlePageChange = async (page: number) => {
+    updateURL(selectedCategory, sortBy, page)
   }
 
   const clearCategoryFilter = () => {
@@ -54,21 +95,19 @@ export default function AreaClient({
 
   const hasActiveFilter = selectedCategory
 
-  // Calculate counts
-  const totalBusinesses = initialBusinesses.length
-  const categoryCounts = categories.map(category => {
-    const count = initialBusinesses.filter(business => 
-      business.category === category
-    ).length
-    return { category, count }
-  }).filter(item => item.count > 0)
-
   const formatCategoryName = (category: string) => {
     return category
       .replace('service', '')
       .replace('company', '')
       .trim()
   }
+
+  const sortOptions = [
+    { value: 'rating', label: 'Highest Rated', icon: Star },
+    { value: 'reviews', label: 'Most Reviews', icon: Users },
+    { value: 'name', label: 'Alphabetical', icon: AArrowUp },
+    { value: 'newest', label: 'Newest', icon: Calendar },
+  ]
 
   return (
     <div>
@@ -80,39 +119,34 @@ export default function AreaClient({
               Local Services in {area}, Dubai
             </h1>
             <p className="text-gray-600 mb-2">
-              {totalBusinesses} service providers in {area}
-              {selectedCategory && ` • ${businesses.length} in ${formatCategoryName(selectedCategory)}`}
+              {data.totalCount.toLocaleString()} service providers in {area}
+              {selectedCategory && ` • ${data.businesses.length} in ${formatCategoryName(selectedCategory)}`}
             </p>
-            
-            {/* Category Counts */}
-            {!selectedCategory && categoryCounts.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {categoryCounts.slice(0, 8).map(({ category, count }) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryChange(category)}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
-                  >
-                    {formatCategoryName(category)}
-                    <span className="ml-1 bg-blue-500 text-white rounded-full px-1.5 py-0.5 text-xs min-w-[20px]">
-                      {count}
-                    </span>
-                  </button>
-                ))}
-                {categoryCounts.length > 8 && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-600">
-                    +{categoryCounts.length - 8} more
-                  </span>
-                )}
-              </div>
-            )}
           </div>
-          
-          {/* Category Filter */}
+
+          {/* Sort and Filter Controls */}
           <div className="flex items-center space-x-4">
-            <button
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <select 
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                value={sortBy}
+                onChange={(e) => handleSortChange(e.target.value)}
+                disabled={isLoading}
+              >
+                {sortOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filter Toggle */}
+            <button 
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={isLoading}
+              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
             >
               <Filter className="w-4 h-4" />
               <span>Filter by Category</span>
@@ -127,20 +161,18 @@ export default function AreaClient({
               <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
                 Filter by Category:
               </label>
-              <select
+              <select 
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={selectedCategory}
                 onChange={(e) => handleCategoryChange(e.target.value)}
+                disabled={isLoading}
               >
                 <option value="">All Categories in {area}</option>
-                {categories.map(category => {
-                  const count = initialBusinesses.filter(b => b.category === category).length
-                  return (
-                    <option key={category} value={category}>
-                      {formatCategoryName(category)} ({count})
-                    </option>
-                  )
-                })}
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {formatCategoryName(category)}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -153,9 +185,10 @@ export default function AreaClient({
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
                 Category: {formatCategoryName(selectedCategory)}
-                <button
-                  onClick={clearCategoryFilter}
-                  className="ml-2 hover:text-blue-600"
+                <button 
+                  onClick={clearCategoryFilter} 
+                  disabled={isLoading}
+                  className="ml-2 hover:text-blue-600 disabled:opacity-50"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -165,27 +198,91 @@ export default function AreaClient({
         )}
       </div>
 
-      {/* Results */}
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {isLoading ? (
-              <div className="flex items-center space-x-2">
-                <LoadingSpinner size="sm" />
-                <span>Filtering services...</span>
-              </div>
-            ) : (
-              `${businesses.length} ${selectedCategory ? formatCategoryName(selectedCategory).toLowerCase() : 'service'} providers found in ${area}`
-            )}
-          </h2>
-        </div>
-        
-        {isLoading ? (
-          <BusinessGridLoading count={6} />
-        ) : (
-          <BusinessGrid businesses={businesses} />
+      {/* Results Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2 sm:mb-0">
+          {isLoading ? (
+            <div className="flex items-center space-x-2">
+              <LoadingSpinner size="sm" />
+              <span>Loading services...</span>
+            </div>
+          ) : (
+            `Showing ${data.businesses.length} of ${data.totalCount.toLocaleString()} ${selectedCategory ? formatCategoryName(selectedCategory).toLowerCase() : 'service'} providers in ${area}`
+          )}
+        </h2>
+
+        {/* Page Info */}
+        {data.totalPages > 1 && (
+          <div className="text-sm text-gray-600">
+            Page {data.currentPage} of {data.totalPages}
+          </div>
         )}
       </div>
+
+      {/* Results Grid */}
+      {isLoading ? (
+        <BusinessGridLoading count={12} />
+      ) : (
+        <>
+          <BusinessGrid businesses={data.businesses} />
+
+          {/* Pagination */}
+          {data.totalPages > 1 && (
+            <div className="flex justify-center items-center space-x-2 mt-8 pt-6 border-t border-gray-200">
+              {/* Previous Button */}
+              <button 
+                onClick={() => handlePageChange(data.currentPage - 1)}
+                disabled={!data.hasPrevPage || isLoading}
+                className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Previous</span>
+              </button>
+
+              {/* Page Numbers */}
+              <div className="flex space-x-1">
+                {Array.from({ length: Math.min(5, data.totalPages) }, (_, i) => {
+                  let pageNum
+                  if (data.totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (data.currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (data.currentPage >= data.totalPages - 2) {
+                    pageNum = data.totalPages - 4 + i
+                  } else {
+                    pageNum = data.currentPage - 2 + i
+                  }
+
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      disabled={isLoading}
+                      className={`px-3 py-2 border rounded-lg min-w-[40px] ${
+                        data.currentPage === pageNum
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'border-gray-300 hover:bg-gray-50'
+                      } disabled:opacity-50`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Next Button */}
+              <button 
+                onClick={() => handlePageChange(data.currentPage + 1)}
+                disabled={!data.hasNextPage || isLoading}
+                className="flex items-center space-x-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>Next</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

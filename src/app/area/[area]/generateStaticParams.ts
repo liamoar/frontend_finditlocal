@@ -1,9 +1,10 @@
 import { BusinessService } from '@/services/businessService'
 
 export async function generateStaticParams() {
-  const areas = await BusinessService.getUniqueAreas()
+  const categories = await BusinessService.getUniqueCategories()
   
-  return areas.map(area => ({
-    area: encodeURIComponent(area),
+  // Only generate paths for categories
+  return categories.map(category => ({
+    category: encodeURIComponent(category),
   }))
 }
