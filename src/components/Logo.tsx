@@ -10,7 +10,7 @@ export default function Logo({ className = "", size = 'md' }: LogoProps) {
   const dimensions = {
     sm: { width: 120, height: 30 },
     md: { width: 160, height: 40 },
-    lg: { width: 200, height: 50 }
+    lg: { width: 200, height: 100 }
   }
 
   const { width, height } = dimensions[size]
@@ -18,7 +18,7 @@ export default function Logo({ className = "", size = 'md' }: LogoProps) {
   return (
     <Link href="/" className={`inline-block ${className}`}>
       <Image
-        src="/logo.png"
+        src="/logo.svg"
         alt="FindInLocal - Discover Local Businesses in Dubai"
         width={width}
         height={height}

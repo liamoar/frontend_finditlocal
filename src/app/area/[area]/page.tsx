@@ -52,7 +52,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       url: canonicalUrl,
       images: [
         {
-          url: '/og-image.jpg',
+          url: '/og-image.png',
           width: 1200,
           height: 630,
           alt: `Find Local Services in ${decodedArea}, Dubai - FindInLocal`,
@@ -63,7 +63,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       card: 'summary_large_image',
       title,
       description,
-      images: ['/og-image.jpg'],
+      images: ['/og-image.png'],
     },
     robots: {
       index: true,
