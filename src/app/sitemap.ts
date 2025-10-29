@@ -3,7 +3,6 @@ import { MetadataRoute } from 'next'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://findinlocal.com'
-  
   const [categories, areas] = await Promise.all([
     BusinessService.getUniqueCategories(),
     BusinessService.getUniqueAreas()
@@ -41,20 +40,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // Category + Area Combination Pages - Use query parameters
-  const categoryAreaPages = categories.flatMap(category =>
-    areas.slice(0, 3).map(area => ({
-      url: `${baseUrl}/category/${encodeURIComponent(category)}?area=${encodeURIComponent(area)}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    }))
-  )
 
   return [
     ...staticPages,
     ...categoryPages,
     ...areaPages,
-    ...categoryAreaPages,
   ]
 }
