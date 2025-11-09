@@ -26,7 +26,7 @@ export default async function Home() {
             Find Trusted Cleaning, Moving, Plumbing & Home Services in Dubai
           </h1>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-            FindInLocal is Dubai’s trusted directory for comparing cleaning
+            FindInLocal is Dubai's trusted directory for comparing cleaning
             companies, movers, plumbers, electricians, AC repair, and pest
             control services. We are not a service provider — instead, we help
             you discover verified businesses so you can make the right choice
@@ -114,7 +114,7 @@ export default async function Home() {
                   Which services are listed on FindInLocal?
                 </h3>
                 <p className="text-gray-700">
-                  You’ll find popular categories like cleaning, moving, plumbing,
+                  You'll find popular categories like cleaning, moving, plumbing,
                   electrician, AC repair, pest control, and more. Each area of
                   Dubai has its own list of trusted providers.
                 </p>
@@ -125,8 +125,8 @@ export default async function Home() {
                   How do I contact a company?
                 </h3>
                 <p className="text-gray-700">
-                  Every listing includes “Call Now”, “WhatsApp”, and “Visit
-                  Website” buttons so you can reach companies directly — no
+                  Every listing includes "Call Now", "WhatsApp", and "Visit
+                  Website" buttons so you can reach companies directly — no
                   middleman or hidden fees.
                 </p>
               </div>
@@ -134,15 +134,33 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Disclaimer for SEO clarity */}
+        {/* Disclaimer & Footer Section */}
         <section className="bg-gray-100 py-10">
-          <div className="max-w-4xl mx-auto px-4 text-center text-gray-600 text-sm">
-            <p>
-              Disclaimer: FindInLocal does not provide cleaning, moving,
-              plumbing, or other services directly. We only list publicly
-              available and verified companies to make it easier for you to find
-              and contact them.
-            </p>
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            {/* Support Email */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Need Help? Contact Us
+              </h3>
+              <div className="text-gray-700">
+                <a 
+                  href="mailto:support@findinlocal.com" 
+                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                >
+                  support@findinlocal.com
+                </a>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <div className="text-sm text-gray-600 border-t border-gray-300 pt-6">
+              <p>
+                Disclaimer: FindInLocal does not provide cleaning, moving,
+                plumbing, or other services directly. We only list publicly
+                available and verified companies to make it easier for you to find
+                and contact them.
+              </p>
+            </div>
           </div>
         </section>
       </main>

@@ -343,13 +343,31 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
             </div>
           </section>
 
-          {/* Disclaimer */}
+          {/* Disclaimer & Footer Section */}
           <section className="bg-gray-100 py-10">
-            <div className="max-w-4xl mx-auto px-4 text-center text-gray-600 text-sm">
-              <p className="capitalize">
-                Disclaimer: FindInLocal does not provide {displayCategoryName.toLowerCase()} services directly. 
+            <div className="max-w-4xl mx-auto px-4 text-center">
+              {/* Support Email */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Need Help? Contact Us
+                </h3>
+                <div className="text-gray-700">
+                  <a 
+                    href="mailto:support@findinlocal.com" 
+                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                  >
+                    support@findinlocal.com
+                  </a>
+                </div>
+              </div>
+
+              {/* Disclaimer */}
+              <div className="text-sm text-gray-600 border-t border-gray-300 pt-6">
+                <p>
+                  Disclaimer: FindInLocal does not provide {displayCategoryName.toLowerCase()} services directly. 
                 We only list publicly available and verified companies to make it easier for you to find and contact them.
-              </p>
+                </p>
+              </div>
             </div>
           </section>
         </main>
